@@ -5,8 +5,8 @@ A production-ready, full-stack expense tracking application built with Node.js, 
 This application was engineered specifically to handle real-world edge cases like unreliable network connections, impatient users double-clicking buttons, and strict data integrity requirements for financial data[cite: 1].
 
 ## 🚀 Live Links
-* **Frontend (Vercel):** `[PASTE VERCEL LINK HERE]`
-* **Backend API (Render):** `[PASTE RENDER LINK HERE]`
+* **Frontend (Vercel):** `https://fenmo-expense-tracker-tawny.vercel.app/`
+* **Backend API (Render):** `https://fenmo-api.onrender.com`
 * *(Note: Render free tier spins down after inactivity. The first API request may take up to 50 seconds to wake the server).*
 
 ---
@@ -43,7 +43,7 @@ This application was engineered specifically to handle real-world edge cases lik
 
 **1. Clone the repository:**
 \`\`\`bash
-git clone https://github.com/YOUR_USERNAME/fenmo-expense-tracker.git
+git clone https://github.com/itaayush/fenmo-expense-tracker.git
 cd fenmo-expense-tracker
 \`\`\`
 
