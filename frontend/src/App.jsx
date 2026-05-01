@@ -1,122 +1,120 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useMemo, useState } from "react";
+import ExpenseForm from "./components/ExpenseForm";
+import ExpenseTable from "./components/ExpenseTable";
+import { fetchExpenses } from "./api/expenseApi";
+
+const categories = [
+  "All",
+  "Housing",
+  "Food",
+  "Transportation",
+  "Utilities",
+  "Health",
+  "Entertainment",
+  "Other",
+];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [expenses, setExpenses] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [sortOrder, setSortOrder] = useState("date_desc");
+
+  async function loadExpenses() {
+    const filters = {
+      category: categoryFilter === "All" ? "" : categoryFilter,
+      sort: sortOrder,
+    };
+
+    try {
+      const data = await fetchExpenses(filters);
+      setExpenses(data);
+    } catch {
+      setExpenses([]);
+    }
+  }
+
+  useEffect(() => {
+    loadExpenses();
+  }, [categoryFilter, sortOrder]);
+
+  const totalAmount = useMemo(() => {
+    const totalInCents = expenses.reduce(
+      (sum, expense) => sum + (expense.amount || 0),
+      0
+    );
+    return (totalInCents / 100).toFixed(2);
+  }, [expenses]);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div style={{ padding: "32px 20px", fontFamily: "system-ui" }}>
+      <header style={{ marginBottom: 24 }}>
+        <h1 style={{ margin: 0 }}>Resilient Expense Tracker</h1>
+      </header>
 
-      <div className="ticks"></div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(260px, 1fr) 2fr",
+          gap: 24,
+          alignItems: "start",
+        }}
+      >
+        <section style={{ padding: 16, border: "1px solid #e5e7eb" }}>
+          <h2 style={{ marginTop: 0 }}>Add Expense</h2>
+          <ExpenseForm onSuccess={loadExpenses} />
+        </section>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <section style={{ padding: 16, border: "1px solid #e5e7eb" }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 12,
+              marginBottom: 16,
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <label htmlFor="categoryFilter" style={{ marginRight: 8 }}>
+                Category
+              </label>
+              <select
+                id="categoryFilter"
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            <div>
+              <label htmlFor="sortOrder" style={{ marginRight: 8 }}>
+                Sort
+              </label>
+              <select
+                id="sortOrder"
+                value={sortOrder}
+                onChange={(event) => setSortOrder(event.target.value)}
+              >
+                <option value="date_desc">Newest First</option>
+                <option value="date_asc">Oldest First</option>
+              </select>
+            </div>
+
+            <div style={{ marginLeft: "auto", fontWeight: 600 }}>
+              Total Visible Expenses: ${totalAmount}
+            </div>
+          </div>
+
+          <ExpenseTable expenses={expenses} />
+        </section>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
